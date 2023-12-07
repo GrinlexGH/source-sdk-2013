@@ -13,6 +13,7 @@
 *.ilk
 *.lastbuildstate
 vc100.pdb
+vc120.pdb
 ipch
 *.sdf
 *.opensdf
@@ -80,12 +81,16 @@ sp/src/*/Release/
 sp/game/*.dll
 sp/game/*.pdb
 sp/game/*.exe
+sp/game/*
 sp/src/utils/*.dll
 sp/src/utils/*.pdb
 sp/src/utils/*.exe
 sp/src/utils/*.res
+sp/src/utils/*/Debug/
 sp/src/materialsystem/*.dll
 sp/src/materialsystem/*.pdb
+sp/src/materialsystem/stdshaders/Debug_dx9_mod_episodic/
+sp/src/materialsystem/stdshaders/Debug_dx9_mod_hl2/
 sp/src/vgui2/*.dll
 sp/src/vgui2/*.pdb
 

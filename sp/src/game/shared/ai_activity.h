@@ -298,6 +298,8 @@ typedef enum
 	ACT_VM_SWINGHARD,			// bludgeon, release the hard strike (secondary attk)
 	ACT_VM_SWINGMISS,
 	ACT_VM_SWINGHIT,
+    ACT_VM_SWINGING,
+    ACT_VM_SWINGINGIDLE,
 	ACT_VM_IDLE_TO_LOWERED,
 	ACT_VM_IDLE_LOWERED,
 	ACT_VM_LOWERED_TO_IDLE,
