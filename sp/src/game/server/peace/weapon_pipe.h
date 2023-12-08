@@ -29,6 +29,7 @@ public:
     DECLARE_ACTTABLE();
 
     CWeaponPipe();
+    void ItemHolsterFrame();
 
     float       GetRange(void)      { return PIPE_RANGE;  }
     float       GetFireRate(void)   { return PIPE_REFIRE; }
@@ -54,7 +55,7 @@ private:
     // Animation event handlers
     void HandleAnimEventMeleeHit(animevent_t* pEvent, CBaseCombatCharacter* pOperator);
 
-    bool  IsSwgStartSeqEnd = true;
+    bool  SwgStartSeqEnd;
     int   SwgStartSeqID;
     float SwgPressStartTime;
     bool  SwgWantToSwing;

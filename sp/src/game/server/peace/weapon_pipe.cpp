@@ -82,6 +82,7 @@ IMPLEMENT_ACTTABLE(CWeaponPipe);
 //-----------------------------------------------------------------------------
 CWeaponPipe::CWeaponPipe(void)
     :
+    SwgStartSeqEnd(true),
     SwgWantToSwing(false),
     SwgPressStartTime(0),
     SwgStartSeqID(0)
@@ -242,43 +243,45 @@ void CWeaponPipe::ItemPostFrame() {
     if (!pOwner)
         return;
 
-    // Если нажата кнопка и анимация не проигрывается
-    if (pOwner->m_afButtonPressed & IN_ATTACK2 && IsSwgStartSeqEnd) {
-        // То запустить анимацию
+    // If button is pressed and swinging animation doesn't play
+    if (pOwner->m_afButtonPressed & IN_ATTACK2 && SwgStartSeqEnd) {
+        // Then start an animation
         SendWeaponAnim(ACT_VM_SWINGING);
-        // и обозначить, что она проигрывается (то есть не закончена)
-        IsSwgStartSeqEnd = false;
+        // and indicate that it is playing (i.e. not finished)
+        SwgStartSeqEnd = false;
 
-        // нужно для определения, закончилась ли анимация
+        // Needed to determine whether the animation has ended
         SwgStartSeqID = GetSequence();
         SwgPressStartTime = gpGlobals->curtime;
     }
-    // >= -- если анимация ещё идёт
-    // <= -- если анимация закончилась
-    // если анимация обозначена что проигрывается (то есть не закончена), но по факту закончилась
-    if (!IsSwgStartSeqEnd && SwgPressStartTime + SequenceDuration(SwgStartSeqID) <= gpGlobals->curtime) {
-        // то обозначить что она закончена
-        IsSwgStartSeqEnd = true;
+    // >= -- animation is not finished
+    // <= -- animation is finished
+    // If the animation is indicated as being played (i.e. not finished), but in fact it has ended
+    if (!SwgStartSeqEnd && SwgPressStartTime + SequenceDuration(SwgStartSeqID) <= gpGlobals->curtime) {
+        // then indicate that it is finished
+        SwgStartSeqEnd = true;
+        // and start idling animation
         SendWeaponAnim(ACT_VM_SWINGINGIDLE);
     }
-    // если анимация закончилась и игрок отжал кнопку
-    if (pOwner->m_afButtonReleased & IN_ATTACK2 && IsSwgStartSeqEnd) {
+    // If animation is finished and player released button
+    if (pOwner->m_afButtonReleased & IN_ATTACK2 && SwgStartSeqEnd) {
+        // then hit
         sk_plr_dmg_pipe.SetValue(100);
         BaseClass::PrimaryAttack();
         sk_plr_dmg_pipe.SetValue(10);
     }
-    // если анимация не закончилась, но игрок отжал кнопку
-    if (pOwner->m_afButtonReleased & IN_ATTACK2 && !IsSwgStartSeqEnd) {
-        //то он хочет ударить
+    // If animation is not finished, but player released button
+    if (pOwner->m_afButtonReleased & IN_ATTACK2 && !SwgStartSeqEnd) {
+        // then he wants to swing
         SwgWantToSwing = true;
     }
-    // если игрок отжал и нажал на кнопку во время того, как шла анимация,
-    // то значит не нужно автоматически ударять после завершения анимации
+    // If player released button and pressed this button while animation is playing
+    // then we don't need to automatically hit after ending of this animation
     if (pOwner->m_afButtonPressed & IN_ATTACK2 && SwgWantToSwing) {
         SwgWantToSwing = false;
     }
-    // если он хочет ударить и анимация закончилась, то автоматически делаем удар
-    if (IsSwgStartSeqEnd && SwgWantToSwing) {
+    // If player want to hit and animation is finished, then automatically hit
+    if (SwgStartSeqEnd && SwgWantToSwing) {
         SwgWantToSwing = false;
         sk_plr_dmg_pipe.SetValue(100);
         BaseClass::PrimaryAttack();
@@ -286,5 +289,13 @@ void CWeaponPipe::ItemPostFrame() {
     }
     
     BaseClass::ItemPostFrame();
+}
+
+void CWeaponPipe::ItemHolsterFrame() {
+    BaseClass::ItemHolsterFrame();
+    SwgStartSeqEnd = true;
+    SwgWantToSwing = false;
+    SwgPressStartTime = 0;
+    SwgStartSeqID = 0;
 }
 
