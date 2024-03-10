@@ -287,7 +287,7 @@ void CWeaponPipe::ItemPostFrame() {
         BaseClass::PrimaryAttack();
         sk_plr_dmg_pipe.SetValue(10);
     }
-    
+
     BaseClass::ItemPostFrame();
 }
 
