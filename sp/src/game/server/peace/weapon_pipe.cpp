@@ -243,44 +243,34 @@ void CWeaponPipe::ItemPostFrame() {
     if (!pOwner)
         return;
 
-    // If button is pressed and swinging animation doesn't play
     if (pOwner->m_afButtonPressed & IN_ATTACK2 && SwgStartSeqEnd) {
-        // Then start an animation
         SendWeaponAnim(ACT_VM_SWINGING);
-        // and indicate that it is playing (i.e. not finished)
         SwgStartSeqEnd = false;
 
-        // Needed to determine whether the animation has ended
         SwgStartSeqID = GetSequence();
         SwgPressStartTime = gpGlobals->curtime;
     }
     // >= -- animation is not finished
     // <= -- animation is finished
-    // If the animation is indicated as being played (i.e. not finished), but in fact it has ended
     if (!SwgStartSeqEnd && SwgPressStartTime + SequenceDuration(SwgStartSeqID) <= gpGlobals->curtime) {
-        // then indicate that it is finished
         SwgStartSeqEnd = true;
-        // and start idling animation
         SendWeaponAnim(ACT_VM_SWINGINGIDLE);
     }
-    // If animation is finished and player released button
+
     if (pOwner->m_afButtonReleased & IN_ATTACK2 && SwgStartSeqEnd) {
-        // then hit
         sk_plr_dmg_pipe.SetValue(100);
         BaseClass::PrimaryAttack();
         sk_plr_dmg_pipe.SetValue(10);
     }
-    // If animation is not finished, but player released button
-    if (pOwner->m_afButtonReleased & IN_ATTACK2 && !SwgStartSeqEnd) {
-        // then he wants to swing
-        SwgWantToSwing = true;
+
+    if (pOwner->m_afButtonReleased & IN_ATTACK2) {
+        if (SwgStartSeqEnd) {
+            SwgWantToSwing = false;
+        } else {
+            SwgWantToSwing = true;
+        }
     }
-    // If player released button and pressed this button while animation is playing
-    // then we don't need to automatically hit after ending of this animation
-    if (pOwner->m_afButtonPressed & IN_ATTACK2 && SwgWantToSwing) {
-        SwgWantToSwing = false;
-    }
-    // If player want to hit and animation is finished, then automatically hit
+
     if (SwgStartSeqEnd && SwgWantToSwing) {
         SwgWantToSwing = false;
         sk_plr_dmg_pipe.SetValue(100);
