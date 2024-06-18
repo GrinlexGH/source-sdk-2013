@@ -82,6 +82,8 @@ IMPLEMENT_ACTTABLE(CWeaponPipe);
 //-----------------------------------------------------------------------------
 CWeaponPipe::CWeaponPipe(void)
     :
+    SwgStartSeqSuccEnd(false),
+    SwgStartSeqShouldPlay(false),
     SwgStartSeqEnd(true),
     SwgWantToSwing(false),
     SwgPressStartTime(0),
@@ -237,55 +239,67 @@ void CWeaponPipe::Operator_HandleAnimEvent(animevent_t *pEvent, CBaseCombatChara
     }
 }
 
-void CWeaponPipe::ItemPostFrame() {
+void CWeaponPipe::ItemPreFrame() {
     CBasePlayer* pOwner = ToBasePlayer(GetOwner());
 
     if (!pOwner)
         return;
 
-    if (pOwner->m_afButtonPressed & IN_ATTACK2 && SwgStartSeqEnd) {
+    if ((pOwner->m_afButtonPressed & IN_ATTACK2) && SwgStartSeqEnd) {
         SendWeaponAnim(ACT_VM_SWINGING);
         SwgStartSeqEnd = false;
-
+        SwgStartSeqShouldPlay = true;
         SwgStartSeqID = GetSequence();
         SwgPressStartTime = gpGlobals->curtime;
     }
+
+    if ((SwgStartSeqShouldPlay && (GetActivity() != ACT_VM_SWINGING))
+        || (SwgStartSeqSuccEnd && (GetActivity() != ACT_VM_SWINGINGIDLE))) {
+        SwgStartSeqShouldPlay = false;
+        SwgStartSeqEnd = true;
+        SwgStartSeqSuccEnd = false;
+    }
+
     // >= -- animation is not finished
     // <= -- animation is finished
-    if (!SwgStartSeqEnd && SwgPressStartTime + SequenceDuration(SwgStartSeqID) <= gpGlobals->curtime) {
+    if (SwgStartSeqShouldPlay && ((SwgPressStartTime + SequenceDuration(SwgStartSeqID)) <= gpGlobals->curtime)) {
+        SwgStartSeqShouldPlay = false;
         SwgStartSeqEnd = true;
+        SwgStartSeqSuccEnd = true;
         SendWeaponAnim(ACT_VM_SWINGINGIDLE);
     }
 
-    if (pOwner->m_afButtonReleased & IN_ATTACK2 && SwgStartSeqEnd) {
-        sk_plr_dmg_pipe.SetValue(100);
+    if (pOwner->m_afButtonReleased & IN_ATTACK2 && SwgStartSeqSuccEnd) {
+        int defValue = sk_plr_dmg_pipe.GetInt();
+        sk_plr_dmg_pipe.SetValue(defValue * 3);
         BaseClass::PrimaryAttack();
-        sk_plr_dmg_pipe.SetValue(10);
+        sk_plr_dmg_pipe.SetValue(defValue);
+        SwgStartSeqSuccEnd = false;
     }
 
-    if (pOwner->m_afButtonReleased & IN_ATTACK2) {
-        if (SwgStartSeqEnd) {
-            SwgWantToSwing = false;
-        } else {
+    if (SwgStartSeqShouldPlay) {
+        if (pOwner->m_afButtonReleased & IN_ATTACK2)
             SwgWantToSwing = true;
-        }
+        else if(pOwner->m_afButtonPressed & IN_ATTACK2)
+            SwgWantToSwing = false;
     }
 
-    if (SwgStartSeqEnd && SwgWantToSwing) {
+    if (SwgStartSeqSuccEnd && SwgWantToSwing) {
         SwgWantToSwing = false;
-        sk_plr_dmg_pipe.SetValue(100);
+        int defValue = sk_plr_dmg_pipe.GetInt();
+        sk_plr_dmg_pipe.SetValue(defValue * 3);
         BaseClass::PrimaryAttack();
-        sk_plr_dmg_pipe.SetValue(10);
+        sk_plr_dmg_pipe.SetValue(defValue);
+        SwgStartSeqSuccEnd = false;
     }
 
-    BaseClass::ItemPostFrame();
+    BaseClass::ItemPreFrame();
 }
 
-void CWeaponPipe::ItemHolsterFrame() {
-    BaseClass::ItemHolsterFrame();
-    SwgStartSeqEnd = true;
-    SwgWantToSwing = false;
-    SwgPressStartTime = 0;
-    SwgStartSeqID = 0;
+void CWeaponPipe::SecondaryAttack() {
+    return;
 }
 
+void CWeaponPipe::PrimaryAttack() {
+    BaseClass::PrimaryAttack();
+}

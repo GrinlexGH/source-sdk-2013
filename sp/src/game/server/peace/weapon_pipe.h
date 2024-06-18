@@ -29,7 +29,9 @@ public:
     DECLARE_ACTTABLE();
 
     CWeaponPipe();
-    void ItemHolsterFrame();
+
+    void    PrimaryAttack(void);
+    void    SecondaryAttack(void);
 
     float       GetRange(void)      { return PIPE_RANGE;  }
     float       GetFireRate(void)   { return PIPE_REFIRE; }
@@ -38,9 +40,8 @@ public:
     float       GetDamageForActivity(Activity hitActivity);
 
     virtual int WeaponMeleeAttack1Condition(float flDot, float flDist);
-    void        SecondaryAttack(void) { return; }
 
-    void ItemPostFrame(void);
+    void ItemPreFrame(void);
 
     // Animation event
     virtual void Operator_HandleAnimEvent(animevent_t* pEvent, CBaseCombatCharacter* pOperator);
@@ -55,6 +56,8 @@ private:
     // Animation event handlers
     void HandleAnimEventMeleeHit(animevent_t* pEvent, CBaseCombatCharacter* pOperator);
 
+    bool  SwgStartSeqSuccEnd;
+    bool  SwgStartSeqShouldPlay;
     bool  SwgStartSeqEnd;
     int   SwgStartSeqID;
     float SwgPressStartTime;
