@@ -946,7 +946,7 @@ void C_SoundscapeSystem::ProcessPlayRandom( KeyValues *pPlayRandom, const subsou
 		{
 			interval_t atten = ReadInterval( pKey->GetString() );
 			sound.soundlevel.start = ATTN_TO_SNDLVL( atten.start );
-			sound.soundlevel.range = ATTN_TO_SNDLVL( atten.start + atten.range ) - sound.soundlevel.start;
+			sound.soundlevel.range = static_cast<int>(ATTN_TO_SNDLVL( atten.start + atten.range )) - sound.soundlevel.start;
 		}
 		else if ( !Q_strcasecmp( pKey->GetName(), "soundlevel" ) )
 		{

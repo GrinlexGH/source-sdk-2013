@@ -1770,7 +1770,7 @@ void CScriptedIconLesson::InitElementsFromKeys( CUtlVector< LessonElement_t > *p
 		pchToken = strtok( szSubKeyName, " " );
 		_fieldtypes paramType = LessonParamTypeFromString( pchToken );
 
-		char *pchParam = "";
+		char *pchParam = nullptr;
 
 		if ( paramType != FIELD_VOID )
 		{

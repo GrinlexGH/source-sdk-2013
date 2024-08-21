@@ -2073,7 +2073,7 @@ static bool CaptionTrace( const char *token )
 	static CUtlSymbolTable s_MissingCloseCaptions;
 
 	// Make sure we only show the message once
-	if ( UTL_INVAL_SYMBOL == s_MissingCloseCaptions.Find( token ) )
+	if ( UTL_INVAL_SYMBOL == static_cast<int>(s_MissingCloseCaptions.Find( token )) )
 	{
 		s_MissingCloseCaptions.AddString( token );
 		return true;

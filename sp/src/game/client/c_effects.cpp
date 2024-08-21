@@ -1085,12 +1085,12 @@ void CClient_Precipitation::UpdateParticlePrecip( C_BasePlayer *pPlayer )
 			if ( !bInside && SubFloat( FindLowestSIMD3( Result.HitDistance ), 0 ) >= m_flParticleInnerDist )
 			{
 				// Kill the inner rain if it's previously been in use
-				if ( m_pParticlePrecipInnerNear != NULL )
+				if ( m_pParticlePrecipInnerNear )
 				{
 					DestroyInnerParticlePrecip();
 				}
 				// Update if we've already got systems, otherwise, create them.
-				if ( m_pParticlePrecipOuter != NULL )
+				if ( m_pParticlePrecipOuter )
 				{
 					m_pParticlePrecipOuter->SetControlPoint( 1,  vOffsetPos );
 					m_pParticlePrecipOuter->SetControlPoint( 3, vDensity );
@@ -1105,12 +1105,12 @@ void CClient_Precipitation::UpdateParticlePrecip( C_BasePlayer *pPlayer )
 				// Update if we've already got systems, otherwise, create them.
 #ifdef MAPBASE
 				// The outer can now be suppressed without interfering with other functionality
-				if ( m_pParticlePrecipOuter != NULL )
+				if ( m_pParticlePrecipOuter )
 				{
 					m_pParticlePrecipOuter->SetControlPoint( 1, vOffsetPos );
 					m_pParticlePrecipOuter->SetControlPoint( 3, vDensity );
 				}
-				if ( m_pParticlePrecipInnerNear != NULL && m_pParticlePrecipInnerFar != NULL )
+				if ( m_pParticlePrecipInnerNear && m_pParticlePrecipInnerFar )
 				{
 					m_pParticlePrecipInnerNear->SetControlPoint( 1, vOffsetPosNear );
 					m_pParticlePrecipInnerFar->SetControlPoint( 1, vOffsetPosFar );
@@ -1147,30 +1147,30 @@ void CClient_Precipitation::InitializeParticlePrecip( void )
 	//Set up which type of precipitation particle we'll use
 	if ( m_nPrecipType == PRECIPITATION_TYPE_PARTICLEASH )
 	{
-		m_pParticleInnerNearDef = "ash";
-		m_pParticleInnerFarDef = "ash";
-		m_pParticleOuterDef = "ash_outer";
+		m_pParticleInnerNearDef = (char*)"ash";
+		m_pParticleInnerFarDef = (char*)"ash";
+		m_pParticleOuterDef = (char*)"ash_outer";
 		m_flParticleInnerDist = 280.0;
 	}
 	else if ( m_nPrecipType == PRECIPITATION_TYPE_PARTICLESNOW )
 	{
-		m_pParticleInnerNearDef = "snow";
-		m_pParticleInnerFarDef = "snow";
-		m_pParticleOuterDef = "snow_outer";
+		m_pParticleInnerNearDef = (char*)"snow";
+		m_pParticleInnerFarDef = (char*)"snow";
+		m_pParticleOuterDef = (char*)"snow_outer";
 		m_flParticleInnerDist = 280.0;
 	}
 	else if ( m_nPrecipType == PRECIPITATION_TYPE_PARTICLERAINSTORM )
 	{
-		m_pParticleInnerNearDef = "rain_storm";
-		m_pParticleInnerFarDef = "rain_storm_screen";
-		m_pParticleOuterDef = "rain_storm_outer";
+		m_pParticleInnerNearDef = (char*)"rain_storm";
+		m_pParticleInnerFarDef = (char*)"rain_storm_screen";
+		m_pParticleOuterDef = (char*)"rain_storm_outer";
 		m_flParticleInnerDist = 0.0;
 	}
 	else  //default to rain
 	{
-		m_pParticleInnerNearDef = "rain";
-		m_pParticleInnerFarDef = "rain";
-		m_pParticleOuterDef = "rain_outer";
+		m_pParticleInnerNearDef = (char*)"rain";
+		m_pParticleInnerFarDef = (char*)"rain";
+		m_pParticleOuterDef = (char*)"rain_outer";
 		m_flParticleInnerDist = 180.0;
 	}
 
@@ -1217,12 +1217,12 @@ void CClient_Precipitation::InitializeParticlePrecip( void )
 
 void CClient_Precipitation::DestroyInnerParticlePrecip( void )
 {
-	if ( m_pParticlePrecipInnerFar != NULL )
+	if ( m_pParticlePrecipInnerFar )
 	{
 		m_pParticlePrecipInnerFar->StopEmission();
 		m_pParticlePrecipInnerFar = NULL;
 	}
-	if ( m_pParticlePrecipInnerNear != NULL )
+	if ( m_pParticlePrecipInnerNear )
 	{
 		m_pParticlePrecipInnerNear->StopEmission();
 		m_pParticlePrecipInnerNear = NULL;
@@ -1231,7 +1231,7 @@ void CClient_Precipitation::DestroyInnerParticlePrecip( void )
 
 void CClient_Precipitation::DestroyOuterParticlePrecip( void )
 {
-	if ( m_pParticlePrecipOuter != NULL )
+	if ( m_pParticlePrecipOuter )
 	{
 		m_pParticlePrecipOuter->StopEmission();
 		m_pParticlePrecipOuter = NULL;
